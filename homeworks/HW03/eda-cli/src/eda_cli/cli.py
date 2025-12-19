@@ -67,6 +67,13 @@ def report(
     sep: str = typer.Option(",", help="Разделитель в CSV."),
     encoding: str = typer.Option("utf-8", help="Кодировка файла."),
     max_hist_columns: int = typer.Option(6, help="Максимум числовых колонок для гистограмм."),
+    # Новые опции
+    title: Optional[str] = typer.Option(None, help="Заголовок отчёта."),
+    top_k_categories: int = typer.Option(5, help="Top-K значений для категориальных признаков."),
+    min_missing_share: float = typer.Option(
+        0.2,
+        help="Порог доли пропусков для пометки колонки как проблемной.",
+    ),
 ) -> None:
     """
     Сгенерировать полный EDA-отчёт:
@@ -86,7 +93,7 @@ def report(
     summary_df = flatten_summary_for_print(summary)
     missing_df = missing_table(df)
     corr_df = correlation_matrix(df)
-    top_cats = top_categories(df)
+    top_cats = top_categories(df, top_k=top_k_categories)
 
     # 2. Качество в целом
     quality_flags = compute_quality_flags(summary, missing_df)
@@ -101,8 +108,13 @@ def report(
 
     # 4. Markdown-отчёт
     md_path = out_root / "report.md"
+    problem_columns = [
+        name for name, share in quality_flags.get("missing_share", {}).items()
+        if share >= min_missing_share
+    ]
     with md_path.open("w", encoding="utf-8") as f:
-        f.write(f"# EDA-отчёт\n\n")
+        report_title = title or "EDA-отчёт"
+        f.write(f"# {report_title}\n\n")
         f.write(f"Исходный файл: `{Path(path).name}`\n\n")
         f.write(f"Строк: **{summary.n_rows}**, столбцов: **{summary.n_cols}**\n\n")
 
@@ -133,6 +145,14 @@ def report(
             f.write("Категориальные/строковые признаки не найдены.\n\n")
         else:
             f.write("См. файлы в папке `top_categories/`.\n\n")
+
+        f.write("## Проблемные колонки по пропускам\n\n")
+        if problem_columns:
+            for col in problem_columns:
+                f.write(f"- {col}\n")
+        else:
+            f.write("Колонки с высокой долей пропусков не найдены.\n")
+        f.write("\n")
 
         f.write("## Гистограммы числовых колонок\n\n")
         f.write("См. файлы `hist_*.png`.\n")

@@ -128,22 +128,54 @@ def top_categories(
     return result
 
 
-def compute_quality_flags(summary: DatasetSummary, missing_df: pd.DataFrame) -> Dict[str, Any]:
+def compute_quality_flags(
+    summary: DatasetSummary,
+    missing_df: pd.DataFrame,
+    high_cardinality_threshold: float = 0.5,
+) -> Dict[str, Any]:
     max_missing = float(missing_df["missing_share"].max()) if not missing_df.empty else 0.0
 
+    constant_columns = [
+        c.name for c in summary.columns if c.unique <= 1
+    ]
+    has_constant_columns = len(constant_columns) > 0
+
+    high_cardinality_columns = [
+        c.name
+        for c in summary.columns
+        if not c.is_numeric and summary.n_rows > 0 and (c.unique / summary.n_rows) >= high_cardinality_threshold
+    ]
+    has_high_cardinality_categoricals = len(high_cardinality_columns) > 0
+
+    too_few_rows = summary.n_rows < 100
+    too_many_columns = summary.n_cols > 100
+    too_many_missing = max_missing > 0.5
+
     score = 1.0 - max_missing
-    if summary.n_rows < 100:
+    if too_few_rows:
         score -= 0.2
-    if summary.n_cols > 100:
+    if too_many_columns:
+        score -= 0.1
+    if has_constant_columns:
+        score -= 0.1
+    if has_high_cardinality_categoricals:
         score -= 0.1
 
     score = max(0.0, min(1.0, score))
 
     return {
-        "too_few_rows": summary.n_rows < 100,
-        "too_many_columns": summary.n_cols > 100,
+        # старые
+        "too_few_rows": too_few_rows,
+        "too_many_columns": too_many_columns,
         "max_missing_share": max_missing,
-        "too_many_missing": max_missing > 0.5,
+        "too_many_missing": too_many_missing,
+        
+        # новые
+        "has_constant_columns": has_constant_columns,
+        "constant_columns": constant_columns,
+        "has_high_cardinality_categoricals": has_high_cardinality_categoricals,
+        "high_cardinality_columns": high_cardinality_columns,
+
         "quality_score": score,
     }
 
