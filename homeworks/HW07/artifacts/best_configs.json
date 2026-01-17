@@ -1,0 +1,48 @@
+{
+  "ds02": {
+    "best_method": "Agglomerative",
+    "KMeans": {
+      "k": 2
+    },
+    "DBSCAN": {
+      "eps": 0.7857142857142857,
+      "min_samples": 10
+    },
+    "Agglomerative": {
+      "k": 2,
+      "linkage": "average"
+    },
+    "criterion": "max silhouette"
+  },
+  "ds03": {
+    "best_method": "Agglomerative",
+    "KMeans": {
+      "k": 3
+    },
+    "DBSCAN": {
+      "eps": 0.3,
+      "min_samples": 10
+    },
+    "Agglomerative": {
+      "k": 2,
+      "linkage": "average"
+    },
+    "criterion": "max silhouette"
+  },
+  "ds04": {
+    "best_method": "DBSCAN",
+    "KMeans": {
+      "k": 5
+    },
+    "DBSCAN": {
+      "eps": 1.7571428571428571,
+      "min_samples": 10
+    },
+    "Agglomerative": {
+      "k": 5,
+      "linkage": "ward"
+    },
+    "criterion": "max silhouette"
+  },
+  "ds02_kmeans_ari_mean": 0.9991001375070265
+}
