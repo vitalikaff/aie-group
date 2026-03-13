@@ -1,0 +1,26 @@
+{
+  "dataset": "EMNIST",
+  "emnist_split": "balanced",
+  "seed": 42,
+  "hidden_sizes": [
+    512,
+    256,
+    128
+  ],
+  "activation": "relu",
+  "dropout_p": 0.0,
+  "use_batchnorm": true,
+  "num_classes": 47,
+  "input_dim": 784,
+  "optimizer": "Adam",
+  "lr": 0.0003,
+  "weight_decay": 0.0,
+  "batch_size": 128,
+  "max_epochs": 5,
+  "early_stopping_patience": 5,
+  "val_frac": 0.2,
+  "best_val_accuracy": 0.8379,
+  "test_accuracy": 0.8323,
+  "test_loss": 0.5103,
+  "experiment_id": "E4"
+}
