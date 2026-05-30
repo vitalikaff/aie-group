@@ -1,0 +1,36 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Python артефакты
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Секреты / локальные конфиги
+.env
+.env.local
+*.secret
+
+# Большие артефакты и данные (хранить вне репозитория)
+artifacts/*.pth
+artifacts/*.pt
+artifacts/*.onnx
+# Картинки-визуализации (artifacts/figures/) коммитим - они мелкие и полезны для отчёта.
+data/Kvasir-SEG/
+data/raw/
+data/processed/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/

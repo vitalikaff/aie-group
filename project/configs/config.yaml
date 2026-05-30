@@ -1,0 +1,47 @@
+# Конфигурация проекта Polyp Segmentation
+# Все пути указаны относительно корня папки project/
+
+paths:
+  data_dir: "data/Kvasir-SEG"
+  artifacts_dir: "artifacts"
+
+# Реестр моделей. Каждая модель полностью описывает свою архитектуру,
+# энкодер (если есть) и путь к чекпойнту.
+models:
+  baseline:
+    architecture: "unet"
+    description: "Vanilla U-Net, обучается с нуля, без предобучения."
+    encoder_name: null
+    checkpoint: "artifacts/best_unet_baseline.pth"
+  final:
+    architecture: "swin_unet"
+    description: "SwinUNet с предобученным энкодером Swin-Small, fine-tune от ImageNet. Финальная модель."
+    encoder_name: "swin_small_patch4_window7_224"
+    checkpoint: "artifacts/best_swin_unet.pth"
+
+model:
+  # Какая из моделей выше используется в сервисе.
+  active: "final"
+  num_classes: 1
+
+inference:
+  image_size: [224, 224]
+  threshold: 0.5
+  normalize_mean: [0.5, 0.5, 0.5]
+  normalize_std: [0.5, 0.5, 0.5]
+
+training:
+  image_size: [224, 224]
+  batch_size: 32           # A100/большие GPU: спокойно держит U-Net и SwinUNet
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  epochs: 50
+  num_workers: 4           # параллельная подгрузка батчей
+  scheduler_factor: 0.5
+  scheduler_patience: 3
+  seed: 42
+
+service:
+  host: "0.0.0.0"
+  port: 8000
+  log_level: "info"
